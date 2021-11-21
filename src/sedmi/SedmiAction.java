@@ -1,6 +1,7 @@
 package sedmi;
 
 import java.awt.event.ActionEvent;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -24,43 +25,28 @@ public class SedmiAction extends AbstractAction{
 	public void actionPerformed(ActionEvent arg0) {
 		
 		try {
-			testSQL();
+			selectView();
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 		}
 		
 
-}
+	}
 	
-private void testSQL() throws SQLException {
+	public CustomerRegions selectView() throws SQLException {
 		
-		Statement stmt = AppCore.getInstance().getCon().createStatement();
-		
-		String statementString="select * from product";
-		
-		ResultSet rs = stmt.executeQuery(statementString);
-
-		ResultSetMetaData rsmd = rs.getMetaData();
-	
-		
-		
-		int columnsNumber = rsmd.getColumnCount();
-		for (int i = 1; i <= columnsNumber; i++ ) {
-			  String name = rsmd.getColumnName(i);
-			  System.out.print(name + " ");
-			}
-		System.out.println();
-		System.out.println("____________________");
-		
-		while(rs.next()) {
-			for (int j2 = 1; j2 <= columnsNumber; j2++) {
-				System.out.print(rs.getString(j2) + " ");
-			}
-			System.out.println();
-		}
-		
-		
+		CustomerRegions customer = new CustomerRegions();
+		String query = "SELECT * FROM customer_regions";
+		PreparedStatement statement = AppCore.getInstance().getCon().prepareStatement(query);
+		ResultSet resultSet = statement.executeQuery();
+			while(resultSet.next()){
+		    	customer.setCustomerCount(resultSet.getInt("Customers"));
+		    	customer.setAvgSales(resultSet.getDouble("averageOrders"));
+		    	customer.setAvgSpent(resultSet.getDouble("averageSpent"));
+		    }
+			sedmiPanel.getTextArea().setText(customer.toString());
+			return customer;
 	}
 
 }

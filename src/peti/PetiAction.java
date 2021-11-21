@@ -1,10 +1,12 @@
 package peti;
 
 import java.awt.event.ActionEvent;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 
@@ -23,43 +25,42 @@ public class PetiAction extends AbstractAction{
 	public void actionPerformed(ActionEvent arg0) {
 		
 		try {
-			testSQL();
+			findMaxSales();
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 		}
 		
-
-}
+	}
 	
-private void testSQL() throws SQLException {
+	public ArrayList<SalesFromTerritory> findMaxSales() throws SQLException {
 		
-		Statement stmt = AppCore.getInstance().getCon().createStatement();
+		ArrayList<SalesFromTerritory> sales = new ArrayList<>();
 		
-		String statementString="select * from product";
-		
-		ResultSet rs = stmt.executeQuery(statementString);
-
-		ResultSetMetaData rsmd = rs.getMetaData();
-	
-		
-		
-		int columnsNumber = rsmd.getColumnCount();
-		for (int i = 1; i <= columnsNumber; i++ ) {
-			  String name = rsmd.getColumnName(i);
-			  System.out.print(name + " ");
+		String query = "SELECT MAX(sp.SalesYTD) as MaxSales, sp.SalesPersonID, sp.TerritoryID, sp.SalesQuota, sp.Bonus, sp.CommissionPct, sp.SalesLastYear, sp.rowguid, sp.ModifiedDate\r\n"
+				+ "FROM salesterritory st\r\n"
+				+ "JOIN salesperson sp\r\n"
+				+ "ON sp.TerritoryID = st.TerritoryID\r\n"
+				+ "GROUP BY st.TerritoryID\r\n";
+		PreparedStatement statement = AppCore.getInstance().getCon().prepareStatement(query);
+		ResultSet resultSet = statement.executeQuery();
+			while(resultSet.next()){ 
+				sales.add(
+					 new SalesFromTerritory(
+								resultSet.getDouble("MaxSales"),
+								resultSet.getInt("SalesPersonID"),
+								resultSet.getInt("TerritoryID"),
+								resultSet.getDouble("SalesQuota"),
+								resultSet.getDouble("Bonus"),
+								resultSet.getDouble("CommissionPct"),
+								resultSet.getDouble("SalesLastYear"),
+								resultSet.getBytes("rowguid"),
+								resultSet.getDate("ModifiedDate")
+								));
+					
 			}
-		System.out.println();
-		System.out.println("____________________");
-		
-		while(rs.next()) {
-			for (int j2 = 1; j2 <= columnsNumber; j2++) {
-				System.out.print(rs.getString(j2) + " ");
-			}
-			System.out.println();
-		}
-		
-		
+			petiPanel.getTextArea().setText(sales.toString());
+			return sales;
 	}
 
 }
