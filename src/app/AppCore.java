@@ -19,8 +19,8 @@ public class AppCore {
 	private static AppCore instance = null;
 	
 	private static String ADRESS = "jdbc:mysql://localhost:3306/";//localhost:3306/javabase//"jdbc:jtds:sqlserver://147.91.175.155/";
-	private static String DATABASE = "ui";//testdb
-	private static String USERNAME = "root", PASSWORD = "1234";
+	private static String DATABASE = "adventureworks";//testdb
+	private static String USERNAME = "root", PASSWORD = "Marijamarija12";
 	
 	private MainFrame mainFrame;
 	

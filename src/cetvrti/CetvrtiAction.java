@@ -1,6 +1,7 @@
 package cetvrti;
 
 import java.awt.event.ActionEvent;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -23,8 +24,10 @@ public class CetvrtiAction extends AbstractAction{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		
+		
 		try {
-			testSQL();
+			createProcedure();
+			callProcedure();
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
@@ -33,34 +36,38 @@ public class CetvrtiAction extends AbstractAction{
 
 }
 	
-private void testSQL() throws SQLException {
-		
-		Statement stmt = AppCore.getInstance().getCon().createStatement();
-		
-		String statementString="select * from product";
-		
-		ResultSet rs = stmt.executeQuery(statementString);
 
-		ResultSetMetaData rsmd = rs.getMetaData();
-	
-		
-		
-		int columnsNumber = rsmd.getColumnCount();
-		for (int i = 1; i <= columnsNumber; i++ ) {
-			  String name = rsmd.getColumnName(i);
-			  System.out.print(name + " ");
-			}
-		System.out.println();
-		System.out.println("____________________");
-		
-		while(rs.next()) {
-			for (int j2 = 1; j2 <= columnsNumber; j2++) {
-				System.out.print(rs.getString(j2) + " ");
-			}
-			System.out.println();
-		}
-		
+	public void createProcedure() throws SQLException {
+		String query = "CREATE PROCEDURE s_getStore(IN storeName varchar(50))\r\n"
+				+ "BEGIN\r\n"
+				+ "	SELECT COUNT(soh.SalesOrderID) as TotalOrders, AVG(sod.OrderQty) as AvgQuantity, MAX(soh.SubTotal) as Earnings\r\n"
+				+ "    FROM store s\r\n"
+				+ "	JOIN customer c\r\n"
+				+ "    ON s.CustomerID = c.CustomerID\r\n"
+				+ "    JOIN salesorderheader soh\r\n"
+				+ "    ON c.CustomerID = soh.CustomerID\r\n"
+				+ "    JOIN salesorderdetail sod\r\n"
+				+ "    ON soh.SalesOrderID = sod.SalesOrderID\r\n"
+				+ "    WHERE s.Name = StoreName;\r\n"
+				+ "    END //\r\n";
+		Statement statement = AppCore.getInstance().getCon().createStatement();
 		
 	}
+	
+	public StoreProcedure callProcedure() throws SQLException {
+		
+		String storeName = "Progressive Sports";
+		StoreProcedure store = new StoreProcedure();
+		String query = "call s_getStore('"+ storeName + "')";
+		PreparedStatement statement = AppCore.getInstance().getCon().prepareStatement(query);
+		ResultSet resultSet = statement.executeQuery();
+			while(resultSet.next()){
+				store.setTotalOrders(resultSet.getInt("TotalOrders"));
+				store.setAvgQuiantity(resultSet.getDouble("AvgQuantity"));
+				store.setEarnings(resultSet.getDouble("Earnings"));
+			}
+		cetvrtiPanel.getTextArea().setText(store.toString());
+		return store;
+		}
 
 }
