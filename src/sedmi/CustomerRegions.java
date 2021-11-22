@@ -2,15 +2,17 @@ package sedmi;
 
 public class CustomerRegions {
 	
+	private String regionName;
 	private int customerCount;
 	private double avgSales;
 	private double avgSpent;
 	
-	public CustomerRegions(int customerCount, double avgSales, double avgSpent) {
+	public CustomerRegions(String regionName, int customerCount, double avgSales, double avgSpent) {
 		
 		this.customerCount = customerCount;
 		this.avgSales = avgSales;
 		this.avgSpent = avgSpent;
+		this.regionName = regionName;
 	}
 
 	public CustomerRegions() {
@@ -41,11 +43,21 @@ public class CustomerRegions {
 		this.avgSpent = avgSpent;
 	}
 
+	public String getRegionName() {
+		return regionName;
+	}
+
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+
 	@Override
 	public String toString() {
-		return "CustomerRegions [customerCount=" + customerCount + ", avgSales=" + avgSales + ", avgSpent=" + avgSpent
-				+ "]";
+		return "CustomerRegions [regionName=" + regionName + ", customerCount=" + customerCount + ", avgSales="
+				+ avgSales + ", avgSpent=" + avgSpent + "]" + "\n";
 	}
+
+	
 	
 	
 

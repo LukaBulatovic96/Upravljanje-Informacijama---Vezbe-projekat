@@ -51,6 +51,7 @@ public class CetvrtiAction extends AbstractAction{
 				+ "    WHERE s.Name = StoreName;\r\n"
 				+ "    END //\r\n";
 		Statement statement = AppCore.getInstance().getCon().createStatement();
+		statement.execute(query);
 		
 	}
 	
